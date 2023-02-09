@@ -1,12 +1,13 @@
 create table new
 (
-    id           bigint primary key,
     title        text,
     author       varchar(10),
-    base_url     varchar(100),
+    link     varchar(100) primary key ,
     source_media varchar(100),
     content      text,
     tag          varchar(10),
-    updated_time timestamp,
-    created_time timestamp
-)
+    updated_at timestamp,
+    created_at timestamp
+);
+
+delete from CONTINUED_LINKS limit 100
