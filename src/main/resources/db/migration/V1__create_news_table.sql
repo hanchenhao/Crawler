@@ -10,4 +10,3 @@ create table new
     created_at timestamp
 );
 
-delete from CONTINUED_LINKS limit 100
