@@ -148,7 +148,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.8.2</version>
                 <configuration>
-                    <url>jdbc:h2:file:/Users/hanchenhao/Desktop/Java学习/Crawler/target</url>
+                    <url>jdbc:h2:file:${project.basedir}/target</url>
                     <user>root</user>
                     <password>123456</password>
                 </configuration>
