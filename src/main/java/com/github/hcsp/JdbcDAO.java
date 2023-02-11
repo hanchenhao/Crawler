@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcDAO {
+public class JdbcDAO implements CrawlerDAO{
     public Connection _connection;
 
     public JdbcDAO(Connection _connection) {
@@ -37,7 +37,7 @@ public class JdbcDAO {
         }
     }
 
-    public String insertArticleInformation(String url, String title, String source, String contents) {
+    public void insertArticleInformation(String url, String title, String source, String contents) {
         if (!isSameLinkInDatabase("select * from new where LINK=?", url)) {
             try (PreparedStatement statement = _connection.prepareStatement(
                     "insert into new( title, link, source_media, content, UPDATED_AT, CREATED_AT) " +
@@ -48,13 +48,11 @@ public class JdbcDAO {
                 statement.setString(4, contents);
                 statement.executeUpdate();
                 System.out.println("插入明细表： " + title);
-                return url;
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
-        return null;
     }
 
     public String getNextContinuedLink() {
@@ -81,7 +79,7 @@ public class JdbcDAO {
         }
     }
 
-    private boolean isSameLinkInDatabase(String sql, String link) {
+    public boolean isSameLinkInDatabase(String sql, String link) {
         try (PreparedStatement statement = _connection.prepareStatement(sql)) {
             System.out.println("正在查询链接是否重复 link= " + link);
             statement.setString(1, link);
