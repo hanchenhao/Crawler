@@ -1,19 +1,24 @@
-package com.github.hcsp;
+package com.github.hanchenhao;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.stream.Collectors;
 
 
 public class NewsCrawler {
-    private final JdbcDAO _DAO;
-    public NewsCrawler(Connection _connection) {
-        this._DAO = new JdbcDAO(_connection);
+    //    private final JdbcDAO _DAO;
+    public MybatisDAO _DAO;
+//    public NewsCrawler(Connection _connection) {
+//        this._DAO = new JdbcDAO(_connection);
+//    }
+
+    public NewsCrawler(MybatisDAO _DAO) {
+        this._DAO = _DAO;
     }
+
     public void run() {
         String link = _DAO.getNextContinuedLink();
         while (link != null) {
@@ -21,6 +26,7 @@ public class NewsCrawler {
             link = _DAO.getNextContinuedLink();
         }
     }
+
     public void insertAllNewsLinks(String page) {
         final String url = "https://www.dushu.com/news/" + page + ".html";
         try {
