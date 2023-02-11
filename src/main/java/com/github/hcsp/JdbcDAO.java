@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JdbcDAO {
-    private final Connection _connection;
+    public Connection _connection;
 
     public JdbcDAO(Connection _connection) {
         this._connection = _connection;
