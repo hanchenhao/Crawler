@@ -5,18 +5,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcDAO implements CrawlerDAO{
+public class JdbcDAO implements CrawlerDAO {
     public Connection _connection;
 
     public JdbcDAO(Connection _connection) {
         this._connection = _connection;
     }
+
     public void insertContinuedLink(String title, String link) {
         if ((!isSameLinkInDatabase("select * from CONTINUED_LINKS where LINK=?", link))) {
             System.out.println("插入缓存表： " + title);
             insertNewsLink("insert into CONTINUED_LINKS(title, link)values ( ?,? )", title, link);
         }
     }
+
     public String insertCompletedLink(String title, String link) {
         if ((!isSameLinkInDatabase("select * from completed_links where LINK=?", link))) {
             System.out.println("插入完成表： " + title);
@@ -79,7 +81,7 @@ public class JdbcDAO implements CrawlerDAO{
         }
     }
 
-    public boolean isSameLinkInDatabase(String sql, String link) {
+    private boolean isSameLinkInDatabase(String sql, String link) {
         try (PreparedStatement statement = _connection.prepareStatement(sql)) {
             System.out.println("正在查询链接是否重复 link= " + link);
             statement.setString(1, link);
