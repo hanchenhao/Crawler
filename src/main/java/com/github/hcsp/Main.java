@@ -13,10 +13,11 @@ public class Main {
         final String password = "123456";
         String jdbcUrl = "jdbc:h2:file:/Users/hanchenhao/Desktop/Java学习/Crawler/target";
         try (Connection connection = DriverManager.getConnection(jdbcUrl, user, password);) {
-            DushuJdbcCrawler crawler = new DushuJdbcCrawler(connection);
+            NewsCrawler crawler = new NewsCrawler(connection);
             for (int i = 1; i < 100; i++) {
-                crawler.insertAllOriginalNewsLinks("85_" + i);
+                crawler.insertAllNewsLinks("85_" + i);
             }
+            crawler.run();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

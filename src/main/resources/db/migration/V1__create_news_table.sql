@@ -9,4 +9,3 @@ create table new
     updated_at timestamp,
     created_at timestamp
 );
-

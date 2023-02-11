@@ -1,65 +1,32 @@
 package com.github.hcsp;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.stream.Collectors;
 
+public class JdbcDAO {
+    private final Connection _connection;
 
-public class DushuJdbcCrawler {
-    public Connection _connection;
-
-    public DushuJdbcCrawler(Connection _connection) {
+    public JdbcDAO(Connection _connection) {
         this._connection = _connection;
     }
-
-    public void run() {
-        String link = getNextLinkAndInsertIntoCompletedLinks("select * from CONTINUED_LINKS limit 1");
-        while (link != null) {
-            link = getNextLinkAndInsertIntoCompletedLinks("select * from CONTINUED_LINKS limit 1");
-        }
-    }
-
-    public void insertAllOriginalNewsLinks(String page) {
-        final String url = "https://www.dushu.com/news/" + page + ".html";
-        try {
-            Document doc = Jsoup.connect(url).get();
-            doc.select("a").forEach(aTag -> {
-                if (isAllowSaveNewsLink(aTag)) {
-                    insertContinuedLink(aTag.text(), ("https://www.dushu.com" + aTag.attr("href")));
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void insertContinuedLink(String title, String link) {
+    public void insertContinuedLink(String title, String link) {
         if ((!isSameLinkInDatabase("select * from CONTINUED_LINKS where LINK=?", link))) {
             System.out.println("插入缓存表： " + title);
             insertNewsLink("insert into CONTINUED_LINKS(title, link)values ( ?,? )", title, link);
-            parseNewsContents(link);
         }
     }
-
-    private String insertCompletedLink(String title, String link) {
+    public String insertCompletedLink(String title, String link) {
         if ((!isSameLinkInDatabase("select * from completed_links where LINK=?", link))) {
             System.out.println("插入完成表： " + title);
             insertNewsLink("insert into completed_links(title, link)values ( ?,? )", title, link);
-            deleteTempLinkFromContinuedTable(link);
             return link;
         }
         return null;
     }
 
-    private void insertNewsLink(String sql, String title, String link) {
+    public void insertNewsLink(String sql, String title, String link) {
         try (PreparedStatement statement = _connection.prepareStatement(sql)) {
             statement.setString(1, title);
             statement.setString(2, link);
@@ -70,7 +37,7 @@ public class DushuJdbcCrawler {
         }
     }
 
-    private void insertArticleIntoDatabase(String url, String title, String source, String contents) {
+    public String insertArticleInformation(String url, String title, String source, String contents) {
         if (!isSameLinkInDatabase("select * from new where LINK=?", url)) {
             try (PreparedStatement statement = _connection.prepareStatement(
                     "insert into new( title, link, source_media, content, UPDATED_AT, CREATED_AT) " +
@@ -81,21 +48,20 @@ public class DushuJdbcCrawler {
                 statement.setString(4, contents);
                 statement.executeUpdate();
                 System.out.println("插入明细表： " + title);
-                insertCompletedLink(title, url);
+                return url;
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
         }
+        return null;
     }
 
-    private String getNextLinkAndInsertIntoCompletedLinks(String sql) {
-        try (PreparedStatement statement = _connection.prepareStatement(sql)) {
+    public String getNextContinuedLink() {
+        try (PreparedStatement statement = _connection.prepareStatement("select * from CONTINUED_LINKS limit 1")) {
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                String link = resultSet.getString("LINK");
-                String title = resultSet.getString("TITLE");
-                return insertCompletedLink(title, link);
+                return resultSet.getString("LINK");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -104,21 +70,7 @@ public class DushuJdbcCrawler {
         return null;
     }
 
-    private void parseNewsContents(String url) {
-        try {
-            Document doc = Jsoup.connect(url).get();
-            String title = doc.select("h1").text();
-            String source = doc.select(".border-right").text();
-            String contents = doc.select(".text p").stream().map(Element::text).collect(Collectors.joining("\n"));
-            insertArticleIntoDatabase(insertCompletedLink(title, url), title, source, contents);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private void deleteTempLinkFromContinuedTable(String link) {
+    public void deleteTempLinkFromContinuedTable(String link) {
         try (PreparedStatement statement = _connection.prepareStatement("delete from CONTINUED_LINKS where LINK=?")) {
             statement.setString(1, link);
             statement.executeUpdate();
@@ -127,12 +79,6 @@ public class DushuJdbcCrawler {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    private boolean isAllowSaveNewsLink(Element link) {
-        String linkHref = link.attr("href");
-        String linkText = link.text();
-        return (linkText.length() >= 5) && linkHref.contains("news") && !linkHref.contains("html");
     }
 
     private boolean isSameLinkInDatabase(String sql, String link) {
@@ -146,4 +92,3 @@ public class DushuJdbcCrawler {
         }
     }
 }
-
