@@ -48,7 +48,8 @@ public class NewsCrawler {
             String title = doc.select("h1").text();
             String source = doc.select(".border-right").text();
             String contents = doc.select(".text p").stream().map(Element::text).collect(Collectors.joining("\n"));
-            _DAO.insertArticleInformation(_DAO.insertCompletedLink(title, url), title, source, contents);
+            _DAO.insertArticleInformation(url, title, source, contents);
+            _DAO.insertCompletedLink(title, url);
             _DAO.deleteTempLinkFromContinuedTable(url);
         } catch (IOException e) {
             e.printStackTrace();

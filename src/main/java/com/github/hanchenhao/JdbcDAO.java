@@ -19,13 +19,11 @@ public class JdbcDAO implements CrawlerDAO {
         }
     }
 
-    public String insertCompletedLink(String title, String link) {
+    public void insertCompletedLink(String title, String link) {
         if ((!isSameLinkInDatabase("select * from completed_links where LINK=?", link))) {
             System.out.println("插入完成表： " + title);
             insertNewsLink("insert into completed_links(title, link)values ( ?,? )", title, link);
-            return link;
         }
-        return null;
     }
 
     public void insertNewsLink(String sql, String title, String link) {
