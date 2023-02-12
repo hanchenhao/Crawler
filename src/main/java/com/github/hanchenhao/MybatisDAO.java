@@ -12,8 +12,7 @@ public class MybatisDAO implements CrawlerDAO {
 
     @Override
     public void insertContinuedLink(String title, String link) {
-        if (!isInContinuedTable(link)) {
-            System.out.println("插入缓存表： " + title);
+        if (isNotInTable("isInContinued", link)) {
             try (SqlSession session = sqlSessionFactory.openSession(true)) {
                 session.insert("com.github.hanchenhao.MybatisDAO.insertContinuedLink", new Link(title, link));
             }
@@ -22,8 +21,7 @@ public class MybatisDAO implements CrawlerDAO {
 
     @Override
     public void insertCompletedLink(String title, String link) {
-        if (!isInCompletedTable(link)) {
-            System.out.println("插入缓存表： " + title);
+        if (isNotInTable("isInCompleted", link)) {
             try (SqlSession session = sqlSessionFactory.openSession(true)) {
                 session.insert("com.github.hanchenhao.MybatisDAO.insertCompletedLink", new Link(title, link));
             }
@@ -32,10 +30,9 @@ public class MybatisDAO implements CrawlerDAO {
 
     @Override
     public void insertArticleInformation(String url, String title, String source, String contents) {
-        if (!isInNewsTable(url)) {
+        if (isNotInTable("isInNews", url)) {
             try (SqlSession session = sqlSessionFactory.openSession(true)) {
                 session.insert("com.github.hanchenhao.MybatisDAO.insertNews", new News(url, title, source, contents));
-                System.out.println("插入明细表： " + title);
             }
         }
     }
@@ -54,24 +51,11 @@ public class MybatisDAO implements CrawlerDAO {
         }
     }
 
-    private boolean isInContinuedTable(String url) {
+    private boolean isNotInTable(String sel, String url) {
         try (SqlSession session = sqlSessionFactory.openSession()) {
-            int count = session.selectOne("com.github.hanchenhao.MybatisDAO.isInContinued", url);
-            return count > 0;
-        }
-    }
-
-    private boolean isInCompletedTable(String url) {
-        try (SqlSession session = sqlSessionFactory.openSession()) {
-            int count = session.selectOne("com.github.hanchenhao.MybatisDAO.isInCompleted", url);
-            return count > 0;
-        }
-    }
-
-    private boolean isInNewsTable(String url) {
-        try (SqlSession session = sqlSessionFactory.openSession()) {
-            int count = session.selectOne("com.github.hanchenhao.MybatisDAO.isInNews", url);
-            return count > 0;
+            String s = "com.github.hanchenhao.MybatisDAO." + sel;
+            int count = session.selectOne(s, url);
+            return count <= 0;
         }
     }
 }

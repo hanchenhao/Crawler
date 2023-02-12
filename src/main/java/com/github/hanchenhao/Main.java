@@ -22,9 +22,11 @@ public class Main {
         MybatisDAO mybatis = new MybatisDAO(sqlSessionFactory);
 
         NewsCrawler crawler = new NewsCrawler(mybatis);
-        for (int i = 1; i < 100; i++) {
-            crawler.insertAllNewsLinks("85_" + i);
-        }
+        crawler.insertAllNewsLinks("85_1");
+
+//        for (int i = 1; i < 100; i++) {
+//            crawler.insertAllNewsLinks("85_" + i);
+//        }
         crawler.run();
     }
 }
