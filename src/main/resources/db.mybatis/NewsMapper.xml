@@ -3,7 +3,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.hanchenhao.MybatisDAO">
     <select id="isInContinued" resultType="Int">
-        select count(*) from CONTINUED_LINKS where link = #{link}
+        select count(*) from continued_links where link = #{link}
     </select>
     <select id="isInCompleted" resultType="Int">
         select count(*) from completed_links where link = #{link}
@@ -12,12 +12,12 @@
         select count(*) from completed_links where link = #{link}
     </select>
     <select id="getNextContinuedLink" resultType="String">
-        select link from CONTINUED_LINKS limit 1
+        select link from continued_links limit 1
     </select>
 
     <insert id="insertContinuedLink"
             parameterType="com.github.hanchenhao.Link">
-        insert into CONTINUED_LINKS(TITLE, LINK)
+        insert into continued_links(TITLE, LINK)
         values (#{title},#{url})
     </insert>
     <insert id="insertCompletedLink"
@@ -31,6 +31,6 @@
         values (#{title},#{url},#{source},#{contents},now(),now())
     </insert>
     <delete id="deleteContinueLink" parameterType="String">
-        delete from CONTINUED_LINKS where LINK=#{link}
+        delete from continued_links where LINK=#{link}
     </delete>
 </mapper>

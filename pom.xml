@@ -52,7 +52,16 @@
         </profile>
     </profiles>
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.32</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+            <version>9.9.0</version>
+        </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
@@ -154,7 +163,7 @@
                 <artifactId>flyway-maven-plugin</artifactId>
                 <version>9.8.2</version>
                 <configuration>
-                    <url>jdbc:h2:file:${project.basedir}/target</url>
+                    <url>jdbc:mysql://localhost:3306/News</url>
                     <user>root</user>
                     <password>123456</password>
                 </configuration>
