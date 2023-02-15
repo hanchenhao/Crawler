@@ -1,11 +1,12 @@
 # a Practice of Crawler
 
 ## Git
-
+```
 git checkout -b new_feature
 git add .
 git commit -m "wirte some describes of new feature"
 git push --set-upstream origin new_feature
+```
 
 ## Checkstyle 
 
